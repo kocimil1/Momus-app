@@ -1,3 +1,5 @@
+![Application View](view.png)
+
 # Installation Instructions
 
 Follow these steps to set up your environment:
