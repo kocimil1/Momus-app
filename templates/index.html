@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molecule Viewer</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+</head>
+<body>
+    <div class="buttons-container">
+        <button onclick="startComputing()">Start computing</button>
+        <input type="file" id="file"></input>
+    </div>
+    <div>{{ molecule_html|safe }}</div>
+    <table border="1">
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>Energy (Hartree)</td><td id="E">{{ E }}</td></tr>
+        <tr><td>Dipole Moment (a.u.)</td><td id="mu">{{ mu }}</td></tr>
+        <tr><td>Qubits number</td><td id="qubit_number">{{ qubit_number }}</td></tr>
+    </table>
+
+    <script>
+        const inputElement = document.getElementById("file");
+        inputElement.addEventListener("change", handleFiles, false);
+        function handleFiles() {
+            console.log("File loading");
+            const fileList = this.files; /* now you can work with the file list */
+            data = fileList[0];
+            console.log(data);
+            name = data.name;
+            fetch('/loadFile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(name)
+            })
+            .then(response => response.text())
+            .then(html => {
+                console.log('Success:', html);
+
+                document.documentElement.innerHTML = html;
+                
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+
+        function startComputing() {
+            const data = { exampleKey: "exampleValue" };
+
+            fetch('/startComputing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                document.getElementById("E").innerHTML = data.E;
+                let muString = data.mu.toString();
+                // Odstranění hranatých závorek
+                muString = muString.replace('[', '').replace(']', '');
+                document.getElementById("mu").innerHTML = muString;
+                document.getElementById("qubit_number").innerHTML = data.qubit_number;
+
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+
+        function loadFile() {
+
+            // Zde přidejte kód pro loadFile
+            console.log("File loading");
+
+
+
+            const data = { exampleKey: "exampleValue" };
+
+            fetch('/loadFile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert(data.message);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
